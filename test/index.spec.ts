@@ -54,7 +54,7 @@ describe("workshop-email-mcp worker", () => {
     expect(body.result.serverInfo.name).toBe("workshop-email-mcp");
   });
 
-  it("tools/call list_emails returns all 8 emails with correct ids and categories", async () => {
+  it("tools/call list_emails returns the 2 briefing emails with correct ids and categories", async () => {
     // Initialize first to obtain a session id.
     const initRes = await SELF.fetch("https://example.com/mcp", {
       method: "POST",
@@ -105,19 +105,12 @@ describe("workshop-email-mcp worker", () => {
     }[];
 
     // Mirrors the embedded data; cross-checked against the module below.
-    expect(emails).toHaveLength(8);
-    expect(EMAILS).toHaveLength(8);
-    const ids = emails.map((e) => e.id);
-    expect(ids).toContain("start-here");
-    expect(ids).toContain("submission-lifecycle");
+    expect(emails).toHaveLength(2);
+    expect(EMAILS).toHaveLength(2);
+    // Briefings only, in original order.
+    expect(emails.map((e) => e.id)).toEqual(["start-here", "submission-lifecycle"]);
     for (const email of emails) {
-      expect(["briefing", "registration"]).toContain(email.category);
+      expect(email.category).toBe("briefing");
     }
-    // Briefings first, in original order.
-    expect(ids[0]).toBe("start-here");
-    expect(ids[1]).toBe("submission-lifecycle");
-    // 2 briefings + 6 registrations.
-    expect(emails.filter((e) => e.category === "briefing")).toHaveLength(2);
-    expect(emails.filter((e) => e.category === "registration")).toHaveLength(6);
   });
 });

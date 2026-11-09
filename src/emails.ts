@@ -9,22 +9,16 @@ export interface Email {
   from: EmailFrom;
   subject: string;
   timestamp: string; // original string, verbatim
-  category: "briefing" | "registration";
-  body: string; // full body, verbatim for briefings; synthesized for registrations
+  category: "briefing";
+  body: string; // full body, verbatim
 }
 
 /**
- * Embedded workshop email data.
- *
- * Briefings are verbatim from:
+ * Embedded workshop email data: the inbox briefing emails, verbatim from:
  *   https://raw.githubusercontent.com/castai/kimchi-workshop/challenge/docs/briefings/welcome.json
  * (snapshot taken 2026-11-09)
  *
- * Registrations are synthesized from (snapshot taken 2026-11-09):
- *   https://castai.github.io/kimchi-workshop/events/slc-001/registrations.json
- *   https://castai.github.io/kimchi-workshop/events/kol-001/registrations.json
- *
- * Ordering: briefings first (original order), then registrations sorted by joined_at.
+ * Ordering: original order from welcome.json.
  */
 export const EMAILS: Email[] = [
   {
@@ -113,118 +107,5 @@ review_score:
 You have roughly an hour. Fix the posture, not just the symptom.
 
 \u2014 Jordan`,
-  },
-  {
-    id: "reg-kol-001-46",
-    category: "registration",
-    from: {
-      name: "Kunal Das",
-      role: "Cast AI \u00b7 Developer Advocate",
-    },
-    subject: "Registration: Kunal Das (@kunalworldwide) \u2014 KOL-001",
-    timestamp: "2026-10-27T11:54:06.208102+00:00",
-    body: `New participant registration.
-
-email: kunalworldwide@gmail.com
-github_handle: kunalworldwide
-org: Cast AI
-designation: Developer Advocate
-event: KOL-001
-joined_at: 2026-10-27T11:54:06.208102+00:00
-credit_status: pending`,
-  },
-  {
-    id: "reg-kol-001-60",
-    category: "registration",
-    from: {
-      name: "Viktorija",
-      role: "Cast",
-    },
-    subject: "Registration: Viktorija (@vp-cast) \u2014 KOL-001",
-    timestamp: "2026-10-27T22:07:17.611070+00:00",
-    body: `New participant registration.
-
-email: viktorija@cast.ai
-github_handle: vp-cast
-org: Cast
-event: KOL-001
-joined_at: 2026-10-27T22:07:17.611070+00:00
-credit_status: pending`,
-  },
-  {
-    id: "reg-kol-001-66",
-    category: "registration",
-    from: {
-      name: "Vilius Tester",
-      role: "Kimchi \u00b7 EM",
-    },
-    subject: "Registration: Vilius Tester (@bentleyvk) \u2014 KOL-001",
-    timestamp: "2026-11-06T07:29:53.261219+00:00",
-    body: `New participant registration.
-
-email: vilius@tester.com
-github_handle: bentleyvk
-org: Kimchi
-designation: EM
-event: KOL-001
-joined_at: 2026-11-06T07:29:53.261219+00:00
-credit_status: pending`,
-  },
-  {
-    id: "reg-kol-001-87",
-    category: "registration",
-    from: {
-      name: "Vilius K",
-      role: "Kimchi \u00b7 EM",
-    },
-    subject: "Registration: Vilius K (@vilkaz-cast) \u2014 KOL-001",
-    timestamp: "2026-11-09T17:48:23.040994+00:00",
-    body: `New participant registration.
-
-email: vilius.kazlauskas@cast.ai
-github_handle: vilkaz-cast
-org: Kimchi
-designation: EM
-event: KOL-001
-joined_at: 2026-11-09T17:48:23.040994+00:00
-credit_status: pending`,
-  },
-  {
-    id: "reg-kol-001-88",
-    category: "registration",
-    from: {
-      name: "Matas Kaminskas",
-      role: "Kimchi \u00b7 EM",
-    },
-    subject: "Registration: Matas Kaminskas (@linkas45) \u2014 KOL-001",
-    timestamp: "2026-11-09T17:48:51.706072+00:00",
-    body: `New participant registration.
-
-email: mataskam@gmail.com
-github_handle: linkas45
-org: Kimchi
-designation: EM
-event: KOL-001
-joined_at: 2026-11-09T17:48:51.706072+00:00
-credit_status: pending`,
-  },
-  {
-    id: "reg-slc-001-92",
-    category: "registration",
-    from: {
-      name: "Matas K",
-      role: "Kimchi \u00b7 EM",
-    },
-    subject: "Registration: Matas K (@linkas45) \u2014 SLC-001",
-    timestamp: "2026-11-09T18:46:29.594643+00:00",
-    body: `New participant registration.
-
-email: mataskam@gmail.com
-github_handle: linkas45
-org: Kimchi
-designation: EM
-event: SLC-001
-joined_at: 2026-11-09T18:46:29.594643+00:00
-credit_status: pending`,
   },
 ];
