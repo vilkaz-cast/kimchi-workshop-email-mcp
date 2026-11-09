@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Wrangler / Cloudflare
+.wrangler/
+.dev.vars
+.dev.vars.*
+
+# Build output
+dist/
+
+# Test coverage
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store

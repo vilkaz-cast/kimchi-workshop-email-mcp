@@ -1,0 +1,25 @@
+{
+  "name": "workshop-email-mcp",
+  "version": "1.0.0",
+  "description": "Fake email MCP server for the Kimchi workshop, hosted on Cloudflare Workers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "agents": "^0.33.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.14.0",
+    "@cloudflare/workers-types": "^5.20261014.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.145.0"
+  }
+}

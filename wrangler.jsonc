@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "workshop-email-mcp",
+  "main": "src/index.ts",
+  // Mirror the Cloudflare agents mcp-worker example config shape.
+  // Note: 2026-04-28 is the newest date supported by the locally installed
+  // workerd binary (miniflare from vitest-pool-workers); bump when deps update.
+  "compatibility_date": "2026-04-28",
+  "compatibility_flags": ["nodejs_compat"]
+}
