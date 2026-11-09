@@ -12,7 +12,7 @@ function createServer(): McpServer {
     "list_emails",
     {
       description:
-        "List the workshop inbox briefing emails.",
+        "List the workshop inbox emails (welcome + briefings).",
       inputSchema: {},
     },
     async () => {

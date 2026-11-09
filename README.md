@@ -2,7 +2,7 @@
 
 A fake email MCP **server** for the Kimchi workshop, hosted on Cloudflare Workers.
 It exposes exactly one MCP tool, `list_emails`, that returns the workshop
-inbox briefing emails. All data
+inbox emails (1 welcome + 5 briefings, 6 in total). All data
 is **embedded in the Worker** — there are no external fetches, no Durable Objects,
 and no authentication (workshop-internal fake server).
 
@@ -34,8 +34,10 @@ npm test
 
 Uses `vitest` with `@cloudflare/vitest-pool-workers` (workers pool, config in
 `wrangler.jsonc`). The tests cover the help route, the MCP `initialize`
-handshake, and a full `tools/call` of `list_emails` (2 briefing emails:
-`start-here` and `submission-lifecycle`).
+handshake, and a full `tools/call` of `list_emails` (6 emails: `welcome`
+plus the briefings `start-here`, `incident-brief`, `spec-docstrings`,
+`kimchi-cadence`, and `submission-lifecycle`; the welcome email is
+identity-sanitized — no attendee name or handle appears in the response).
 
 Type checking:
 
@@ -64,5 +66,8 @@ client to call the `list_emails` tool.
 
 ## Updating the email data
 
-All emails live in `src/emails.ts` as a snapshot. To refresh the briefings,
+All emails live in `src/emails.ts` as a snapshot of the live gh-pages inbox
+(6 emails: the welcome email plus 5 briefings, sourced from
+`https://castai.github.io/kimchi-workshop/briefings/welcome.json` and the
+personalized welcome email, sanitized of attendee identity). To refresh,
 edit that file and redeploy.

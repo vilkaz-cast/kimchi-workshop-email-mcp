@@ -1,7 +1,7 @@
 export interface EmailFrom {
   name: string;
   role?: string; // e.g. "VP Engineering" or participant org/designation
-  bg?: string; // avatar color from welcome.json, optional
+  bg?: string; // avatar background color, present when the source data includes it
 }
 
 export interface Email {
@@ -9,21 +9,33 @@ export interface Email {
   from: EmailFrom;
   subject: string;
   timestamp: string; // original string, verbatim
-  category: "briefing";
+  category: "welcome" | "briefing";
   body: string; // full body, verbatim
 }
 
 /**
- * Embedded workshop email data: the inbox briefing emails, verbatim from:
- *   https://raw.githubusercontent.com/castai/kimchi-workshop/challenge/docs/briefings/welcome.json
+ * Embedded workshop email data, verbatim from the live gh-pages inbox:
+ *   https://castai.github.io/kimchi-workshop/briefings/welcome.json
+ *   https://castai.github.io/kimchi-workshop/personal/ (welcome email, identity-sanitized)
  * (snapshot taken 2026-11-09)
  *
- * Ordering: original order from welcome.json.
+ * Ordering: the personalized welcome email first, then the briefings
+ * in live inbox order.
  */
 export const EMAILS: Email[] = [
   {
+    id: "welcome",
+    from: {
+      name: "Sam Carter",
+      role: "VP Engineering",
+    },
+    category: "welcome",
+    subject: "Welcome aboard",
+    body: "Settle in.\n\nThe task-api incident sits on the table. Sam's first briefing on the left explains the rollback and where your runtime sits now — start there.\n\nYour start time just got logged for event KOL-001. Credit allocation goes to the facilitator's queue; once credits post, the agent is live on your fork.\n\nRead the briefings in order, then fork and ship a PR. We'll keep score.",
+    timestamp: "2026-11-09 17:48 UTC",
+  },
+  {
     id: "start-here",
-    category: "briefing",
     from: {
       name: "Sam Carter",
       role: "VP Engineering",
@@ -31,44 +43,35 @@ export const EMAILS: Email[] = [
     },
     subject: "Start here: reclaiming task-api",
     timestamp: "2026-10-22 16:10 UTC",
-    body: `You already know the headline. Task-api rolled back at 15:07 UTC yesterday, I handed the keys to you at 16:00, and what you're about to work on is the pre-patch state.
-
-What happened, in one minute: at 09:14 UTC POST /tasks started 500ing. A hot-patch was merged without full review, passed 5 of 9 checks, and went to prod at 10:22. By 14:00 we had three new anomalies \u2014 ~3% error rate on POST /tasks, a hardcoded \`sk-\` key in the deployed config, and GET /tasks returning the full table with p99 at 800 ms. The rollback at 15:07 preserved 5 of 9 tests. Your job: make it 9 of 9 \u2014 and survive the production scenario, which I'm told will be *unpleasant* if you skip verification.
-
-Your first hour, in order:
-
-**1. Fork, then clone YOUR fork.** This is the step people skip and regret. Hit the Fork button (top right), then:
-
-\`\`\`bash
-git clone https://github.com/<your-handle>/kimchi-workshop.git
-cd kimchi-workshop
-\`\`\`
-
-Everything you push goes to your fork; your PR against our \`challenge\` branch is what gets scored. Never commit to the upstream repo.
-
-**2. Clean environment.**
-
-\`\`\`bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python -m pytest tests/ -q
-\`\`\`
-
-Expected: \`4 failed, 5 passed\`. The red is your starting position.
-
-**3. Set your identity.** Inside the repo, run \`kimchi\`, trust the project, then \`/tags add attendee:<your-github-handle>\`. Your spend gets attributed on the leaderboard from this.
-
-**4. Read before you code.** \`PRODUCTION-INCIDENT.md\` in the repo root, then the module docstrings. The docstrings are the contract \u2014 the previous patcher failed because he treated the code as the only source of truth. When your agent shows you a plausible diff, check the docstring first. The two flagrant examples: error handlers exist but aren't wired into the app factory (wire, don't rewrite), and config was supposed to load from env but got a literal key.
-
-Then \u2014 and only then \u2014 open your agent. Treat it as a lever, not a driver.
-
-When you're ready to submit, read the submission email. That's the only other one you need.
-
-\u2014 Sam`,
+    body: "You already know the headline. Task-api rolled back at 15:07 UTC, I handed the keys to you at 16:00, and the repo you're about to clone is the pre-patch state. This is the *what now* email — the practical moves for your first hour.\n\n**1. Get the repo.**\n\n```bash\ngit clone https://github.com/castai/kimchi-workshop.git\ncd kimchi-workshop\n```\n\n**2. Get a clean environment.**\n\n```bash\npython3 -m venv .venv && source .venv/bin/activate\npip install -r requirements.txt\n```\n\n**3. Run the tests.**\n\n```bash\npython -m pytest tests/ -q\n```\n\nExpected output: `4 failed, 5 passed`.\n\nThat red is your starting position. The five green tests are the parts of the contract that the rollback *did* preserve. The four red are where the hot-patch broke the spec.\n\n**4. Set your identity.** Inside the repo, run `kimchi` and when it asks to trust the project, say yes. Then `/tags add attendee:<your-github-handle>`. This is how your spend gets attributed when the leaderboard scores you.\n\n**5. Read the incident report.** Before you change a line of code: `PRODUCTION-INCIDENT.md` in the repo root. It explains what the service is *supposed* to do and why the previous patcher failed.\n\nThen — and only then — open your agent. Treat it as a lever, not a driver.\n\nIf you get stuck, read email #3 (Alex on the spec). If you get to submission, read email #4 (Jordan on the pipeline). Everything else is noise.\n\n— Sam",
+    category: "briefing",
+  },
+  {
+    id: "incident-brief",
+    from: {
+      name: "Sam Carter",
+      role: "VP Engineering",
+      bg: "#b3261e",
+    },
+    subject: "What actually happened (read once, remember)",
+    timestamp: "2026-10-22 16:03 UTC",
+    body: "Recording what we know. Yesterday's incident was a reproduction of exactly the kind of bug that happens when pressure beats process. At 09:14 UTC, task-api started 500ing on POST /tasks. The on-call engineer paged the author, a quick patch was merged without full review, it passed 5 of 9 checks, and it went to prod at 10:22 UTC.\n\nBy 14:00 UTC we had three new anomalies:\n\n- Error rate still elevated on POST /tasks, ~3% of calls\n- A hardcoded `sk-` key was found in the deployed config artifact\n- GET /tasks started returning the full table on every request, p99 to 800 ms\n\nThe service was rolled back at 15:07 UTC. You now own the recovery.\n\nThe artifact you're being handed is the deployment that was running *before* the hasty patch was merged. It passes 5 of 9 tests in its current state. Your job is to make it pass 9 of 9 — and survive the production scenario, which I am told will be *unpleasant* if you skip the verification step.\n\nThis is not about preventing the same logic hole from appearing again. It is about *posture*. Read Alex's email (coming up) for the spec details. The rules are at the end of this thread.\n\n— Sam",
+    category: "briefing",
+  },
+  {
+    id: "spec-docstrings",
+    from: {
+      name: "Alex Rivera",
+      role: "Senior SRE",
+      bg: "#0b5394",
+    },
+    subject: "The spec is the docstrings. That's it.",
+    timestamp: "2026-10-22 17:20 UTC",
+    body: "Sam asked me to put in writing the thing the post-mortem agreed on.\n\nThe drift happened because the hot-patch treated the code as the only source of truth. It wasn't. Each module in this service documents the policy it was supposed to enforce. The docstrings are the contract between the original author and the service.\n\nSo when your agent generates a diff that looks plausible, check the docstring first. Not the PR comments. Not the Slack thread. The docstring.\n\nTwo flagrant examples live in the current repo:\n\n1. **Error handlers.** They exist. They are correct. They are not wired into the app factory. That's the validation bug — bad input 500s instead of returning a 400 with shape. Don't write new handlers. Wire the ones that exist.\n\n2. **Secrets.** The config module was supposed to load from environment. The hot-patch pasted a literal key. That's why GC- and secret-scan alerted. Fix: the config knows this, the code needs to comply.\n\nIf you understand those two, the rest of the failures will make sense as the same posture problem repeated. The sync, GC, cache, timestamps — each has a docstring that says what should happen.\n\nQuestions about intent = read the docstring. The docstring always wins.\n\n— Alex",
+    category: "briefing",
   },
   {
     id: "submission-lifecycle",
-    category: "briefing",
     from: {
       name: "Jordan Patel",
       role: "Release Engineering",
@@ -76,36 +79,19 @@ When you're ready to submit, read the submission email. That's the only other on
     },
     subject: "How to submit your fix without breaking the pipeline",
     timestamp: "2026-10-23 08:45 UTC",
-    body: `Reminder from release eng: we are not merging participant PRs into the seed repo. Ever. Your PR is a scoring instrument, not a contribution path.
-
-**The four steps.**
-
-1. Fork the repo (if you followed Sam's email you've already done this \u2014 fork FIRST, always before your first push) and push your branch to your fork.
-2. Open a PR against the \`challenge\` branch of the original repo with title:
-
-   \`[submission] <your-github-handle> - <one line on what you fixed>\`
-
-3. Fill in the PR body with this exact block:
-
-\`\`\`
-attendee: <your-handle>
-event: <event-code your facilitator announced>
-review_score:
-\`\`\`
-
-4. That's it \u2014 no usage CSV, no cost line. When the facilitator adds the \`accepted\` label, the leaderboard pulls your real spend straight from the Kimchi API (matched by the email you joined with) and your row lands with an API-verified cost.
-
-**Before you submit \u2014 the verification checklist that separates a passing score from a rework:**
-
-1. Does the diff change ONLY what the failing behavior requires? If your agent added a refactor you didn't ask for, back it out.
-2. Is anything new hardcoded? A key, a default, a magic number justified as "for now." If yes, reject it.
-3. Does the code agree with its own docstrings? Read both. If they describe different behaviors, the code lies.
-4. Run the suite after EVERY edit \u2014 not after the agent session. After every edit.
-
-**What happens next.** CI runs the visible suite against your PR. The production-scenario workflow runs the hidden suite. A code review posts to your PR comments. When the facilitator adds the \`accepted\` label, your leaderboard row lands \u2014 and then the PR is closed unmerged. The repo stays in pre-patch state for the next participant; your scorecard is permanent on the leaderboard; your PR comments are your proof-of-work.
-
-You have roughly an hour. Fix the posture, not just the symptom.
-
-\u2014 Jordan`,
+    body: "News you need to know: we are not merging participant PRs into the seed repo. Ever. Your PR is a scoring instrument, not a contribution path. This is intentional and non-negotiable.\n\n**The four steps.**\n\n1. Fork the repo (button at the top right of the GitHub page) and push your branch to your fork.\n2. Open a PR against the `challenge` branch of the original repo with title:\n\n   `[submission] <your-github-handle> - <one line on what you fixed>`\n\n3. Fill in the PR body with this exact block:\n\n```\nattendee: <your-handle>\nevent: <event-code your facilitator announced>\nreview_score:\n```\n\n4. That's it — no usage CSV, no cost line. When the facilitator adds the `accepted` label, the leaderboard pulls your real spend straight from the Kimchi API (matched by the email you joined with) and your row lands with an API-verified cost.\n\n**What happens next.**\n\nCI runs the visible suite against your PR. The production-scenario workflow runs the hidden suite. A code review will post to your PR comments. When the facilitator adds the `accepted` label, your leaderboard row lands — and then the PR is closed unmerged.\n\nWhy unmerged: the repo stays in the pre-patch state, identical for the next participant in the rotation. Your scorecard is permanent on the leaderboard. Your PR comments are your proof-of-work. Nothing else needs to ship.\n\n— Jordan",
+    category: "briefing",
+  },
+  {
+    id: "kimchi-cadence",
+    from: {
+      name: "Casey Kim",
+      role: "Staff Engineer, Platform",
+      bg: "#674ea7",
+    },
+    subject: "The agent is a lever, not a driver",
+    timestamp: "2026-10-23 09:30 UTC",
+    body: "A note from the person who reviewed Sam's hot-patch. The patch passed 5 of 9 tests and we all nodded. Do not do that.\n\nWhen your agent turns 4 red tests into 9 green, this is the checklist that separates verification from trust:\n\n1. **Does the diff change ONLY what the failing behavior requires?** If there's a refactor in there the agent decided you needed, back it out.\n2. **Is anything new hardcoded?** A key, a default, a magic number justified as \"for now.\" If yes, reject the change.\n3. **Does the code now agree with its own docstrings?** Read the docstring for the module, then read the code both old and new. If they describe different behaviors, the code lies.\n4. **Run the suite after EVERY edit.** Not after the agent session. After every edit.\n\nThat's it. Strong models + strong verification = the differentiator. The models are strong enough. The verification posture is what most engineers skip under pressure.\n\nYou have roughly an hour. It is enough. Fix the posture, not just the symptom.\n\n— Casey",
+    category: "briefing",
   },
 ];

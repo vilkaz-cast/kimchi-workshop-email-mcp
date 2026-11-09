@@ -54,7 +54,7 @@ describe("workshop-email-mcp worker", () => {
     expect(body.result.serverInfo.name).toBe("workshop-email-mcp");
   });
 
-  it("tools/call list_emails returns the 2 briefing emails with correct ids and categories", async () => {
+  it("tools/call list_emails returns the 6 inbox emails with correct ids and categories", async () => {
     // Initialize first to obtain a session id.
     const initRes = await SELF.fetch("https://example.com/mcp", {
       method: "POST",
@@ -99,18 +99,33 @@ describe("workshop-email-mcp worker", () => {
     expect(body.result.content).toHaveLength(1);
     expect(body.result.content[0].type).toBe("text");
 
-    const emails = JSON.parse(body.result.content[0].text) as {
+    const text = body.result.content[0].text;
+    const emails = JSON.parse(text) as {
       id: string;
       category: string;
     }[];
 
     // Mirrors the embedded data; cross-checked against the module below.
-    expect(emails).toHaveLength(2);
-    expect(EMAILS).toHaveLength(2);
-    // Briefings only, in original order.
-    expect(emails.map((e) => e.id)).toEqual(["start-here", "submission-lifecycle"]);
-    for (const email of emails) {
-      expect(email.category).toBe("briefing");
-    }
+    expect(emails).toHaveLength(6);
+    expect(EMAILS).toHaveLength(6);
+    // Welcome on top, then briefings in live inbox order.
+    expect(emails.map((e) => e.id)).toEqual([
+      "welcome",
+      "start-here",
+      "incident-brief",
+      "spec-docstrings",
+      "submission-lifecycle",
+      "kimchi-cadence",
+    ]);
+    expect(EMAILS.map((e) => e.id)).toEqual(emails.map((e) => e.id));
+    // Categories include both the personalized welcome and the briefings.
+    const categories = new Set(emails.map((e) => e.category));
+    expect(categories.has("welcome")).toBe(true);
+    expect(categories.has("briefing")).toBe(true);
+
+    // Identity sanitization: the attendee's name and handle must not leak
+    // anywhere in the tool's returned JSON.
+    expect(text).not.toContain("Vilius");
+    expect(text).not.toContain("vilkaz");
   });
 });
